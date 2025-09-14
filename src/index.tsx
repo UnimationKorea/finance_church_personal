@@ -205,6 +205,112 @@ app.get('/', (c) => {
               box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
             }
 
+            /* 횡적 레이아웃 스타일 */
+            .horizontal-layout {
+              display: flex;
+              gap: 20px;
+              height: calc(100vh - 200px);
+              min-height: 600px;
+            }
+
+            .left-panel {
+              flex: 0 0 400px;
+              background: #f8f9fa;
+              border-radius: 12px;
+              padding: 20px;
+              overflow-y: auto;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+
+            .right-panel {
+              flex: 1;
+              background: #ffffff;
+              border-radius: 12px;
+              padding: 20px;
+              overflow-y: auto;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+
+            .panel-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 20px;
+              padding-bottom: 15px;
+              border-bottom: 2px solid #e9ecef;
+            }
+
+            .panel-header h3 {
+              margin: 0;
+              color: #495057;
+              font-size: 18px;
+            }
+
+            .list-actions {
+              display: flex;
+              gap: 8px;
+              align-items: center;
+            }
+
+            .summary-section {
+              margin-top: 30px;
+              padding: 20px;
+              background: #fff;
+              border-radius: 8px;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+
+            .summary-section h4 {
+              margin: 0 0 15px 0;
+              color: #495057;
+              font-size: 16px;
+            }
+
+            .summary-grid {
+              display: grid;
+              gap: 12px;
+            }
+
+            .summary-item {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 12px;
+              border-radius: 6px;
+              font-size: 14px;
+            }
+
+            .summary-item.income {
+              background: #d4edda;
+              color: #155724;
+            }
+
+            .summary-item.expense {
+              background: #f8d7da;
+              color: #721c24;
+            }
+
+            .summary-item.balance {
+              background: #d1ecf1;
+              color: #0c5460;
+              font-weight: bold;
+            }
+
+            .summary-item .label {
+              font-weight: 500;
+            }
+
+            .summary-item .value {
+              font-weight: bold;
+              font-size: 15px;
+            }
+
+            .btn-small {
+              padding: 4px 8px;
+              font-size: 12px;
+              border-radius: 4px;
+            }
+
             /* 메인 메뉴 선택 화면 */
             .main-menu-section {
               display: none;
@@ -419,6 +525,17 @@ app.get('/', (c) => {
             .form-group {
               display: flex;
               flex-direction: column;
+            }
+            
+            .form-actions {
+              display: flex;
+              gap: 12px;
+              align-items: center;
+              margin-top: 20px;
+            }
+            
+            .form-actions button {
+              flex-shrink: 0;
             }
 
             .form-group label {
@@ -749,10 +866,10 @@ app.get('/', (c) => {
 
                         />
                         <br />
-                        <button class="btn-primary" id="loginButton">
+                        <button class="btn-primary" id="loginBtn">
                             로그인
                         </button>
-                        <button class="btn-secondary" id="cancelButton">
+                        <button class="btn-secondary" id="cancelBtn">
                             취소
                         </button>
                     </div>
@@ -786,218 +903,229 @@ app.get('/', (c) => {
                     </div>
                 </div>
 
-                <!-- 회계 관리 섹션 -->
+                <!-- 회계 관리 섹션 (횡적 레이아웃) -->
                 <div class="app-section" id="accountingSection">
                     <button class="back-btn" data-action="main-menu">← 메인 메뉴</button>
                     <div class="current-department" id="currentDepartmentAccounting"></div>
 
-                    <div class="tabs">
-                        <button class="tab active" data-tab="input">거래 입력</button>
-                        <button class="tab" data-tab="list">거래 목록</button>
-                        <button class="tab" data-tab="summary">현황 요약</button>
-                    </div>
+                    <!-- 횡적 레이아웃: 좌측 입력폼, 우측 목록 -->
+                    <div class="horizontal-layout">
+                        <!-- 좌측: 거래 입력 폼 -->
+                        <div class="left-panel">
+                            <div class="panel-header">
+                                <h3>💰 거래 정보 입력</h3>
+                            </div>
+                            <form id="transactionForm">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="transactionDate">날짜 <span class="required">*</span></label>
+                                        <input type="date" id="transactionDate" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="transactionType">유형 <span class="required">*</span></label>
+                                        <select id="transactionType" required onchange="updateCategoryOptions()">
+                                            <option value="">선택하세요</option>
+                                            <option value="수입">수입</option>
+                                            <option value="지출">지출</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="transactionCategory">항목 <span class="required">*</span></label>
+                                        <select id="transactionCategory" required>
+                                            <option value="">유형을 먼저 선택하세요</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="transactionAmount">금액 <span class="required">*</span></label>
+                                        <input type="number" id="transactionAmount" min="0" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="transactionManager">담당자</label>
+                                        <input type="text" id="transactionManager" placeholder="담당자명">
+                                    </div>
+                                    
+                                    <div class="form-group" style="grid-column: 1 / -1;">
+                                        <label for="transactionDescription">적요 <span class="required">*</span></label>
+                                        <textarea id="transactionDescription" rows="3" placeholder="거래 내용 입력" required maxlength="500"></textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">거래 추가</button>
+                                    <button type="button" class="btn-secondary" id="cancelTransactionEdit" style="display: none;" data-action="cancel-edit">수정 취소</button>
+                                </div>
+                            </form>
+                            
+                            <!-- 현황 요약 -->
+                            <div class="summary-section">
+                                <h4>📊 재정 현황</h4>
+                                <div class="summary-grid">
+                                    <div class="summary-item income">
+                                        <span class="label">총 수입:</span>
+                                        <span class="value" id="totalIncome">₩0</span>
+                                    </div>
+                                    <div class="summary-item expense">
+                                        <span class="label">총 지출:</span>
+                                        <span class="value" id="totalExpense">₩0</span>
+                                    </div>
+                                    <div class="summary-item balance">
+                                        <span class="label">잔액:</span>
+                                        <span class="value" id="totalBalance">₩0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                    <!-- 거래 입력 탭 -->
-                    <div class="tab-content active" id="accountingInputTab">
-                        <h3>거래 정보 입력</h3>
-                        <form id="transactionForm">
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="transactionDate">날짜 <span class="required">*</span></label>
-                                    <input type="date" id="transactionDate" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="transactionType">유형 <span class="required">*</span></label>
-                                    <select id="transactionType" required>
-                                        <option value="">선택하세요</option>
-                                        <option value="수입">수입</option>
-                                        <option value="지출">지출</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="transactionCategory">항목 <span class="required">*</span></label>
-                                    <select id="transactionCategory" required>
-                                        <option value="">유형을 먼저 선택하세요</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="transactionAmount">금액 <span class="required">*</span></label>
-                                    <input type="number" id="transactionAmount" min="0" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="transactionManager">담당자</label>
-                                    <input type="text" id="transactionManager" placeholder="담당자명을 입력하세요">
-                                </div>
-                                
-                                <div class="form-group" style="grid-column: 1 / -1;">
-                                    <label for="transactionDescription">적요 <span class="required">*</span></label>
-                                    <textarea id="transactionDescription" rows="3" placeholder="거래 내용을 자세히 입력하세요" required maxlength="500"></textarea>
+                        <!-- 우측: 거래 목록 -->
+                        <div class="right-panel">
+                            <div class="panel-header">
+                                <h3>📋 거래 목록</h3>
+                                <div class="list-actions">
+                                    <input type="text" id="transactionSearch" placeholder="검색..." style="width: 100px; font-size: 12px;">
+                                    <button class="btn btn-info btn-small" id="exportAccountingBtn">💾 CSV</button>
+                                    <button class="btn btn-warning btn-small" id="importAccountingBtn">📁 업로드</button>
+                                    <button class="btn btn-secondary btn-small" id="refreshAccountingBtn">🔄</button>
                                 </div>
                             </div>
                             
-                            <button type="submit" class="btn-primary">거래 추가</button>
-                        </form>
-                    </div>
-
-                    <!-- 거래 목록 탭 -->
-                    <div class="tab-content" id="accountingListTab">
-                        <div class="action-buttons">
-                            <button class="btn-success btn-small" id="exportAccountingBtn">💾 CSV 저장</button>
-                            <button class="btn-info btn-small" id="importAccountingBtn">📁 CSV 불러오기</button>
-                            <button class="btn-danger btn-small" id="clearAccountingBtn">🗑️ 전체 삭제</button>
-                            <button class="btn-secondary btn-small" id="refreshAccountingBtn">🔄 새로고침</button>
-                        </div>
-
-                        <input type="file" id="csvFile" accept=".csv" style="display: none;">
-
-                        <div class="table-container">
-                            <table class="transaction-table">
-                                <thead>
-                                    <tr>
-                                        <th class="sortable" data-sort="date">날짜 <span class="sort-arrow"></span></th>
-                                        <th class="sortable" data-sort="type">유형 <span class="sort-arrow"></span></th>
-                                        <th class="sortable" data-sort="category">항목 <span class="sort-arrow"></span></th>
-                                        <th>적요</th>
-                                        <th>담당자</th>
-                                        <th class="sortable" data-sort="amount">금액 <span class="sort-arrow"></span></th>
-                                        <th>작업</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="transactionList">
-                                    <tr>
-                                        <td colspan="7" class="loading">데이터를 불러오는 중...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- 현황 요약 탭 -->
-                    <div class="tab-content" id="accountingSummaryTab">
-                        <div class="summary-cards">
-                            <div class="summary-card income">
-                                <h3>총 수입</h3>
-                                <div class="amount" id="totalIncome">0원</div>
-                            </div>
-                            <div class="summary-card expense">
-                                <h3>총 지출</h3>
-                                <div class="amount" id="totalExpense">0원</div>
-                            </div>
-                            <div class="summary-card balance">
-                                <h3>잔액</h3>
-                                <div class="amount" id="totalBalance">0원</div>
+                            <input type="file" id="csvFile" accept=".csv" style="display: none;">
+                            
+                            <div class="table-container">
+                                <table class="transaction-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="sortable" data-sort="date">날짜 ↕</th>
+                                            <th class="sortable" data-sort="type">유형 ↕</th>
+                                            <th class="sortable" data-sort="category">항목 ↕</th>
+                                            <th>적요</th>
+                                            <th>담당자</th>
+                                            <th class="sortable" data-sort="amount">금액 ↕</th>
+                                            <th>작업</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="transactionList">
+                                        <tr>
+                                            <td colspan="7" class="loading">데이터를 불러오는 중...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 사역 관리 섹션 -->
+                <!-- 사역 관리 섹션 (횡적 레이아웃) -->
                 <div class="ministry-section" id="ministrySection">
                     <button class="back-btn" id="ministryBackBtn">← 메인 메뉴</button>
                     <div class="current-department" id="currentDepartmentMinistry"></div>
 
-                    <div class="tabs">
-                        <button class="tab active" data-ministry-tab="input">사역 입력</button>
-                        <button class="tab" data-ministry-tab="list">사역 목록</button>
-                    </div>
-
-                    <!-- 사역 입력 탭 -->
-                    <div class="tab-content active" id="ministryInputTab">
-                        <h3>사역 정보 입력</h3>
-                        <form id="ministryForm">
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="ministryDate">날짜 <span class="required">*</span></label>
-                                    <input type="date" id="ministryDate" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="ministryType">유형 <span class="required">*</span></label>
-                                    <select id="ministryType" required>
-                                        <option value="">선택하세요</option>
-                                        <option value="사역">사역</option>
-                                        <option value="기도제목">기도제목</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="ministryCategory">항목 <span class="required">*</span></label>
-                                    <select id="ministryCategory" required>
-                                        <option value="">유형을 먼저 선택하세요</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group" style="grid-column: 1 / -1;">
-                                    <label for="ministryContent">내용 <span class="required">*</span></label>
-                                    <textarea id="ministryContent" rows="4" placeholder="사역 내용을 자세히 입력하세요" required maxlength="1000"></textarea>
-                                </div>
+                    <!-- 횡적 레이아웃: 좌측 입력폼, 우측 목록 -->
+                    <div class="horizontal-layout">
+                        <!-- 좌측: 사역 입력 폼 -->
+                        <div class="left-panel">
+                            <div class="panel-header">
+                                <h3>📋 사역 정보 입력</h3>
                             </div>
+                            <form id="ministryForm">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="ministryDate">날짜 <span class="required">*</span></label>
+                                        <input type="date" id="ministryDate" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="ministryType">유형 <span class="required">*</span></label>
+                                        <select id="ministryType" required onchange="updateMinistryCategoryOptions()">
+                                            <option value="">선택하세요</option>
+                                            <option value="사역">사역</option>
+                                            <option value="기도제목">기도제목</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="ministryCategory">항목 <span class="required">*</span></label>
+                                        <select id="ministryCategory" required>
+                                            <option value="">유형을 먼저 선택하세요</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group" style="grid-column: 1 / -1;">
+                                        <label for="ministryContent">내용 <span class="required">*</span></label>
+                                        <textarea id="ministryContent" rows="6" placeholder="사역 내용을 자세히 입력하세요" required maxlength="1000"></textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">내용 추가</button>
+                                    <button type="button" class="btn-secondary" id="cancelMinistryEdit" style="display: none;" data-action="cancel-edit">수정 취소</button>
+                                </div>
+                            </form>
                             
-                            <div class="form-actions">
-                                <button type="submit" class="btn-primary">내용 추가</button>
-                                <button type="button" class="btn-secondary" id="cancelEditBtn" style="display: none;">수정 취소</button>
+                            <!-- 빠른 액션 버튼 -->
+                            <div class="summary-section">
+                                <h4>🔧 관리 도구</h4>
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <button class="btn btn-info btn-small" id="exportMinistryBtn">💾 CSV</button>
+                                    <button class="btn btn-warning btn-small" id="importMinistryBtn">📁 업로드</button>
+                                    <button class="btn btn-secondary btn-small" id="refreshMinistryBtn">🔄 새로고침</button>
+                                </div>
+                                <input type="file" id="ministryCsvFile" accept=".csv" style="display: none;">
                             </div>
-                        </form>
-                    </div>
-
-                    <!-- 사역 목록 탭 -->
-                    <div class="tab-content" id="ministryListTab">
-                        <div class="action-buttons">
-                            <button class="btn-success btn-small" id="exportMinistryBtn">💾 CSV 저장</button>
-                            <button class="btn-info btn-small" id="importMinistryBtn">📁 CSV 불러오기</button>
-                            <button class="btn-danger btn-small" id="clearMinistryBtn">🗑️ 전체 삭제</button>
-                            <button class="btn-secondary btn-small" id="refreshMinistryBtn">🔄 새로고침</button>
                         </div>
 
-                        <input type="file" id="ministryCsvFile" accept=".csv" style="display: none;">
-                        <p><strong>CSV 파일 형식:</strong> 날짜, 유형, 항목, 내용</p>
-
-                        <div class="ministry-tables">
-                            <!-- 사역 목록 테이블 -->
-                            <div class="ministry-table-section ministry-type">
-                                <h3>🔨 사역 목록</h3>
-                                <div class="table-container">
-                                    <table class="transaction-table">
-                                        <thead>
-                                            <tr>
-                                                <th class="sortable" data-sort="date">날짜 <span class="sort-arrow"></span></th>
-                                                <th class="sortable" data-sort="category">항목 <span class="sort-arrow"></span></th>
-                                                <th>내용</th>
-                                                <th>작업</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="ministryList">
-                                            <tr>
-                                                <td colspan="4" class="loading">데이터를 불러오는 중...</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                        <!-- 우측: 사역 목록 -->
+                        <div class="right-panel">
+                            <div class="panel-header">
+                                <h3>📝 사역 & 기도제목 목록</h3>
                             </div>
+                            
+                            <div class="ministry-tables" style="height: calc(100% - 60px); overflow-y: auto;">
+                                <!-- 사역 목록 테이블 -->
+                                <div class="ministry-table-section ministry-type" style="margin-bottom: 30px;">
+                                    <h4 style="color: #495057; margin-bottom: 15px;">🔨 사역 목록</h4>
+                                    <div class="table-container">
+                                        <table class="transaction-table">
+                                            <thead>
+                                                <tr>
+                                                    <th class="sortable" data-sort="date">날짜 ↕</th>
+                                                    <th class="sortable" data-sort="category">항목 ↕</th>
+                                                    <th>내용</th>
+                                                    <th>작업</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="ministryList">
+                                                <tr>
+                                                    <td colspan="4" class="loading">데이터를 불러오는 중...</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
 
-                            <!-- 기도제목 목록 테이블 -->
-                            <div class="ministry-table-section prayer-type">
-                                <h3>🙏 기도제목 목록</h3>
-                                <div class="table-container">
-                                    <table class="transaction-table">
-                                        <thead>
-                                            <tr>
-                                                <th class="sortable" data-sort="date">날짜 <span class="sort-arrow"></span></th>
-                                                <th class="sortable" data-sort="category">항목 <span class="sort-arrow"></span></th>
-                                                <th>내용</th>
-                                                <th>작업</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="prayerList">
-                                            <tr>
-                                                <td colspan="4" class="loading">데이터를 불러오는 중...</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                <!-- 기도제목 목록 테이블 -->
+                                <div class="ministry-table-section prayer-type">
+                                    <h4 style="color: #495057; margin-bottom: 15px;">🙏 기도제목 목록</h4>
+                                    <div class="table-container">
+                                        <table class="transaction-table">
+                                            <thead>
+                                                <tr>
+                                                    <th class="sortable" data-sort="date">날짜 ↕</th>
+                                                    <th class="sortable" data-sort="category">항목 ↕</th>
+                                                    <th>내용</th>
+                                                    <th>작업</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="prayerList">
+                                                <tr>
+                                                    <td colspan="4" class="loading">데이터를 불러오는 중...</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1012,8 +1140,20 @@ app.get('/', (c) => {
             let currentDepartment = '';
             let selectedDepartment = '';
             let currentMode = '';
-            let editState = null; // { type: 'transaction'|'ministry', id }
-            let submitting = false; // 중복 제출 방지
+            
+            // 전역 상태 (중복 방지 및 단일 소스)
+            const state = {
+                initialized: false,
+                isSubmitting: false,
+                editState: null, // { type: 'transaction'|'ministry', id }
+                seenOps: new Set(), // 중복 방지 토큰
+                transactions: [],
+                ministries: []
+            };
+            
+            // 유틸: 고유 ID/토큰
+            const uid = () => (crypto.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).slice(2));
+            const newOpToken = () => 'op_' + uid();
 
             // 카테고리 옵션 정의
             const categoryOptions = {
@@ -1027,8 +1167,45 @@ app.get('/', (c) => {
                 '기도제목': ['기도제목']
             };
 
-            // 페이지 로드 시 초기화
-            document.addEventListener('DOMContentLoaded', function() {
+            // 클라이언트용 메모리 저장소 (localStorage 전용)
+            const clientStorage = {
+                loadFromLocalStorage() {
+                    if (typeof localStorage !== 'undefined') {
+                        try {
+                            const data = localStorage.getItem('saesoon_client_data');
+                            console.log('📁 클라이언트 로컬스토리지 복원 시도');
+                        } catch (e) {
+                            console.warn('로컬스토리지 복원 실패:', e);
+                        }
+                    }
+                },
+                saveToLocalStorage() {
+                    if (typeof localStorage !== 'undefined') {
+                        try {
+                            localStorage.setItem('saesoon_client_data', JSON.stringify({
+                                lastLogin: new Date().toISOString(),
+                                department: currentDepartment
+                            }));
+                            console.log('💾 클라이언트 데이터 저장 완료');
+                        } catch (e) {
+                            console.warn('로컬스토리지 저장 실패:', e);
+                        }
+                    }
+                }
+            };
+
+            // 초기화(단 한 번만) - ChatGPT 솔루션 적용
+            function initOnce() {
+                if (state.initialized) {
+                    console.log('⚠️ 이미 초기화된 상태 - 중복 초기화 방지');
+                    return;
+                }
+                state.initialized = true;
+                console.log('🚀 시스템 초기화 시작 (단일 초기화)');
+                
+                // 클라이언트 로컬스토리지에서 데이터 복원
+                clientStorage.loadFromLocalStorage();
+                
                 const today = new Date().toISOString().split('T')[0];
                 if (document.getElementById('transactionDate')) {
                     document.getElementById('transactionDate').value = today;
@@ -1037,20 +1214,446 @@ app.get('/', (c) => {
                     document.getElementById('ministryDate').value = today;
                 }
                 
-                // 폼 이벤트 리스너 초기화
-                initTransactionForm();
-                initMinistryForm();
+                // 폼 submit만 사용, 버튼 click 핸들러는 제거
+                const transactionForm = document.getElementById('transactionForm');
+                if (transactionForm) {
+                    transactionForm.addEventListener('submit', onAddTransaction);
+                }
                 
-                // 목록 이벤트 위임 초기화
-                initTransactionListEvents();
-                initMinistryListEvents();
+                const ministryForm = document.getElementById('ministryForm');
+                if (ministryForm) {
+                    ministryForm.addEventListener('submit', onAddMinistry);
+                }
                 
-                // 로그인 버튼 이벤트 리스너 초기화
+                // 동적 버튼들(수정/삭제/취소)은 body에 위임
+                document.body.addEventListener('click', onDelegatedClick);
+                
+                // 로그인 버튼 이벤트 리스너 초기화 (Enter 키 지원)
                 initLoginButtons();
                 
-                // 테이블 정렬 이벤트 리스너 초기화
-                initTableSorting();
-            });
+                console.log('✅ 시스템 초기화 완료');
+            }
+            
+            // 페이지 로드 시 초기화
+            document.addEventListener('DOMContentLoaded', initOnce);
+
+            // =================== 새로운 이벤트 핸들러들 (ChatGPT 솔루션) ===================
+            
+            // 거래 추가/수정 (폼 submit만) - ChatGPT 솔루션 수정
+            async function onAddTransaction(e) {
+                e.preventDefault();
+                if (state.isSubmitting) {
+                    console.log('⚠️ 중복 제출 방지됨');
+                    showMessage('⏳ 처리 중입니다. 잠시만 기다려주세요.', 'info');
+                    return;
+                }
+                
+                state.isSubmitting = true;
+                
+                try {
+                    // 수정 모드 확인
+                    const isEditing = state.editState && state.editState.type === 'transaction';
+                    const editId = isEditing ? state.editState.id : null;
+                    
+                    const form = e.currentTarget;
+                    const rec = {
+                        id: isEditing ? editId : uid(),
+                        op: newOpToken(),
+                        date: document.getElementById('transactionDate').value,
+                        type: document.getElementById('transactionType').value,
+                        category: document.getElementById('transactionCategory').value,
+                        description: document.getElementById('transactionDescription').value,
+                        manager: document.getElementById('transactionManager').value,
+                        amount: Number(document.getElementById('transactionAmount').value || 0)
+                    };
+                    
+                    if (!rec.date || !rec.type || !rec.category || !rec.description || !rec.amount) {
+                        showMessage('❌ 필수 항목을 모두 입력해주세요.', 'error');
+                        return;
+                    }
+                    
+                    // 중복 방지: 같은 op 토큰이면 무시 (새 추가일 때만)
+                    if (!isEditing && state.seenOps.has(rec.op)) {
+                        console.log('⚠️ 중복 작업 토큰 - 무시됨');
+                        return;
+                    }
+                    if (!isEditing) state.seenOps.add(rec.op);
+                    
+                    console.log(isEditing ? '🔄 거래 수정 API 호출:' : '💰 거래 추가 API 호출:', rec);
+                    showMessage(isEditing ? '⏳ 거래를 수정하고 있습니다...' : '⏳ 거래를 추가하고 있습니다...', 'info');
+                    
+                    const url = isEditing ? 
+                        '/api/accounting/transaction/' + currentDepartment + '/' + encodeURIComponent(editId) :
+                        '/api/accounting/transaction/' + currentDepartment;
+                    const method = isEditing ? 'PUT' : 'POST';
+                    
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(rec)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showMessage('✅ ' + result.message, 'success');
+                        
+                        if (isEditing) {
+                            // 수정 모드 종료
+                            cancelEdit();
+                        } else {
+                            // 폼 초기화 (내용만 초기화)
+                            document.getElementById('transactionDescription').value = '';
+                            document.getElementById('transactionManager').value = '';
+                            document.getElementById('transactionAmount').value = '';
+                            document.getElementById('transactionDescription').focus();
+                        }
+                        
+                        // 목록 새로고침
+                        loadTransactions();
+                    } else {
+                        showMessage('❌ ' + result.message, 'error');
+                    }
+                    
+                } catch (error) {
+                    console.error('거래 처리 오류:', error);
+                    showMessage('❌ 거래 처리 중 오류가 발생했습니다: ' + error.message, 'error');
+                } finally {
+                    state.isSubmitting = false;
+                }
+            }
+            
+            // 사역 추가/수정 (폼 submit만) - ChatGPT 솔루션 수정
+            async function onAddMinistry(e) {
+                e.preventDefault();
+                if (state.isSubmitting) {
+                    console.log('⚠️ 중복 제출 방지됨');
+                    showMessage('⏳ 처리 중입니다. 잠시만 기다려주세요.', 'info');
+                    return;
+                }
+                
+                state.isSubmitting = true;
+                
+                try {
+                    // 수정 모드 확인
+                    const isEditing = state.editState && state.editState.type === 'ministry';
+                    const editId = isEditing ? state.editState.id : null;
+                    
+                    const form = e.currentTarget;
+                    const rec = {
+                        id: isEditing ? editId : uid(),
+                        op: newOpToken(),
+                        date: document.getElementById('ministryDate').value,
+                        type: document.getElementById('ministryType').value,
+                        category: document.getElementById('ministryCategory').value,
+                        content: document.getElementById('ministryContent').value
+                    };
+                    
+                    if (!rec.date || !rec.type || !rec.category || !rec.content) {
+                        showMessage('❌ 필수 항목을 모두 입력해주세요.', 'error');
+                        return;
+                    }
+                    
+                    // 중복 방지: 같은 op 토큰이면 무시 (새 추가일 때만)
+                    if (!isEditing && state.seenOps.has(rec.op)) {
+                        console.log('⚠️ 중복 작업 토큰 - 무시됨');
+                        return;
+                    }
+                    if (!isEditing) state.seenOps.add(rec.op);
+                    
+                    console.log(isEditing ? '🔄 사역 수정 API 호출:' : '📋 사역 추가 API 호출:', rec);
+                    showMessage(isEditing ? '⏳ 사역 내용을 수정하고 있습니다...' : '⏳ 사역 내용을 추가하고 있습니다...', 'info');
+                    
+                    const url = isEditing ? 
+                        '/api/ministry/item/' + currentDepartment + '/' + encodeURIComponent(editId) :
+                        '/api/ministry/item/' + currentDepartment;
+                    const method = isEditing ? 'PUT' : 'POST';
+                    
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(rec)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showMessage('✅ ' + result.message, 'success');
+                        
+                        if (isEditing) {
+                            // 수정 모드 종료
+                            cancelEdit();
+                        } else {
+                            // 내용만 초기화 (날짜/유형/항목 유지)
+                            document.getElementById('ministryContent').value = '';
+                            document.getElementById('ministryContent').focus();
+                        }
+                        
+                        // 목록 새로고침
+                        loadMinistryItems();
+                    } else {
+                        showMessage('❌ ' + result.message, 'error');
+                    }
+                    
+                } catch (error) {
+                    console.error('사역 처리 오류:', error);
+                    showMessage('❌ 사역 처리 중 오류가 발생했습니다: ' + error.message, 'error');
+                } finally {
+                    state.isSubmitting = false;
+                }
+            }
+            
+            // 위임 클릭 (수정/삭제/취소) - ChatGPT 솔루션 핵심
+            function onDelegatedClick(e) {
+                const editBtn = e.target.closest('[data-action="edit"]');
+                const deleteBtn = e.target.closest('[data-action="delete"]');
+                const cancelBtn = e.target.closest('[data-action="cancel-edit"]');
+                
+                if (!editBtn && !deleteBtn && !cancelBtn) return;
+                
+                if (editBtn) {
+                    const id = editBtn.dataset.id;
+                    const row = editBtn.closest('tr');
+                    console.log('✏️ 수정 버튼 클릭:', id);
+                    
+                    // 거래인지 사역인지 판단 (테이블 위치로)
+                    if (row && row.closest('#transactionList')) {
+                        loadTransactionForEdit(row);
+                    } else if (row && (row.closest('#ministryList') || row.closest('#prayerList'))) {
+                        loadMinistryForEdit(row);
+                    }
+                }
+                
+                if (deleteBtn) {
+                    const id = deleteBtn.dataset.id;
+                    const row = deleteBtn.closest('tr');
+                    console.log('🗑️ 삭제 버튼 클릭:', id);
+                    
+                    if (!confirm('정말 삭제하시겠습니까?')) return;
+                    
+                    // 거래인지 사역인지 판단
+                    if (row && row.closest('#transactionList')) {
+                        deleteTransactionById(id);
+                    } else if (row && (row.closest('#ministryList') || row.closest('#prayerList'))) {
+                        deleteMinistryById(id);
+                    }
+                }
+                
+                if (cancelBtn) {
+                    console.log('❌ 취소 버튼 클릭');
+                    cancelEdit();
+                }
+            }
+            
+            // 거래 삭제 (ID 기반)
+            async function deleteTransactionById(id) {
+                try {
+                    showMessage('⏳ 삭제 처리 중...', 'info');
+                    const response = await fetch('/api/accounting/transaction/' + currentDepartment + '/' + encodeURIComponent(id), {
+                        method: 'DELETE'
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showMessage('✅ ' + result.message, 'success');
+                        loadTransactions();
+                    } else {
+                        showMessage('❌ ' + result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('거래 삭제 오류:', error);
+                    showMessage('❌ 삭제 중 오류가 발생했습니다: ' + error.message, 'error');
+                }
+            }
+            
+            // 사역 삭제 (ID 기반)  
+            async function deleteMinistryById(id) {
+                try {
+                    showMessage('⏳ 삭제 처리 중...', 'info');
+                    const response = await fetch('/api/ministry/item/' + currentDepartment + '/' + encodeURIComponent(id), {
+                        method: 'DELETE'
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showMessage('✅ ' + result.message, 'success');
+                        loadMinistryItems();
+                    } else {
+                        showMessage('❌ ' + result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('사역 삭제 오류:', error);
+                    showMessage('❌ 삭제 중 오류가 발생했습니다: ' + error.message, 'error');
+                }
+            }
+            
+            // 수정 취소
+            function cancelEdit() {
+                state.editState = null;
+                console.log('수정 모드 취소됨');
+                
+                // 거래 폼 일반 모드로 복원
+                const transactionForm = document.getElementById('transactionForm');
+                if (transactionForm) {
+                    toggleEditUI(false, 'transaction');
+                }
+                
+                // 사역 폼 일반 모드로 복원
+                const ministryForm = document.getElementById('ministryForm');
+                if (ministryForm) {
+                    toggleEditUI(false, 'ministry');
+                }
+            }
+            
+            // 거래 수정 로드 (ChatGPT 솔루션)
+            function loadTransactionForEdit(row) {
+                const data = {
+                    id: row.dataset.id,
+                    date: row.dataset.date,
+                    type: row.dataset.txnType,
+                    category: row.dataset.category,
+                    description: row.dataset.description,
+                    manager: row.dataset.manager,
+                    amount: row.dataset.amount
+                };
+                
+                console.log('🔄 거래 수정 데이터 로드:', data);
+                state.editState = { type: 'transaction', id: data.id, data: data };
+                
+                fillAccountFormForEdit(data);
+                toggleEditUI(true, 'transaction');
+            }
+            
+            // 사역 수정 로드 (ChatGPT 솔루션)
+            function loadMinistryForEdit(row) {
+                const data = {
+                    id: row.dataset.id,
+                    date: row.dataset.date,
+                    type: row.dataset.ministryType,
+                    category: row.dataset.category,
+                    content: row.dataset.content
+                };
+                
+                console.log('🔄 사역 수정 데이터 로드:', data);
+                state.editState = { type: 'ministry', id: data.id, data: data };
+                
+                fillMinistryFormForEdit(data);
+                toggleEditUI(true, 'ministry');
+            }
+            
+            // 거래 폼에 수정 데이터 채우기 (ChatGPT 솔루션)
+            function fillAccountFormForEdit(data) {
+                document.getElementById('transactionDate').value = data.date || '';
+                document.getElementById('transactionType').value = data.type || '';
+                
+                // 카테고리 옵션 업데이트 후 선택
+                updateCategoryOptions();
+                setTimeout(() => {
+                    document.getElementById('transactionCategory').value = data.category || '';
+                }, 50);
+                
+                document.getElementById('transactionDescription').value = data.description || '';
+                document.getElementById('transactionManager').value = data.manager || '';
+                document.getElementById('transactionAmount').value = data.amount || '';
+            }
+            
+            // 사역 폼에 수정 데이터 채우기 (ChatGPT 솔루션)
+            function fillMinistryFormForEdit(data) {
+                document.getElementById('ministryDate').value = data.date || '';
+                document.getElementById('ministryType').value = data.type || '';
+                
+                // 카테고리 옵션 업데이트 후 선택
+                updateMinistryCategoryOptions();
+                setTimeout(() => {
+                    document.getElementById('ministryCategory').value = data.category || '';
+                }, 50);
+                
+                document.getElementById('ministryContent').value = data.content || '';
+            }
+            
+            // UI 수정 모드 토글 (ChatGPT 솔루션)
+            function toggleEditUI(isEdit, formType) {
+                if (formType === 'transaction') {
+                    const submitBtn = document.querySelector('#transactionForm button[type="submit"]');
+                    const cancelBtn = document.getElementById('cancelTransactionEdit');
+                    
+                    if (isEdit) {
+                        submitBtn.textContent = '수정 완료';
+                        submitBtn.className = 'btn btn-warning';
+                        if (cancelBtn) cancelBtn.style.display = 'inline-block';
+                    } else {
+                        submitBtn.textContent = '거래 추가';
+                        submitBtn.className = 'btn btn-primary';
+                        if (cancelBtn) cancelBtn.style.display = 'none';
+                        
+                        // 폼 초기화
+                        const today = new Date().toISOString().split('T')[0];
+                        document.getElementById('transactionDate').value = today;
+                        document.getElementById('transactionType').value = '';
+                        document.getElementById('transactionCategory').value = '';
+                        document.getElementById('transactionDescription').value = '';
+                        document.getElementById('transactionManager').value = '';
+                        document.getElementById('transactionAmount').value = '';
+                    }
+                }
+                
+                if (formType === 'ministry') {
+                    const submitBtn = document.querySelector('#ministryForm button[type="submit"]');
+                    const cancelBtn = document.getElementById('cancelMinistryEdit');
+                    
+                    if (isEdit) {
+                        submitBtn.textContent = '수정 완료';
+                        submitBtn.className = 'btn btn-warning';
+                        if (cancelBtn) cancelBtn.style.display = 'inline-block';
+                    } else {
+                        submitBtn.textContent = '사역 추가';
+                        submitBtn.className = 'btn btn-primary';
+                        if (cancelBtn) cancelBtn.style.display = 'none';
+                        
+                        // 폼 초기화
+                        const today = new Date().toISOString().split('T')[0];
+                        document.getElementById('ministryDate').value = today;
+                        document.getElementById('ministryType').value = '';
+                        document.getElementById('ministryCategory').value = '';
+                        document.getElementById('ministryContent').value = '';
+                    }
+                }
+            }
+
+            // 로그인 버튼 이벤트 초기화 (ChatGPT 솔루션)
+            function initLoginButtons() {
+                // Enter 키로 비밀번호 입력 지원
+                const passwordInput = document.getElementById('departmentPassword');
+                if (passwordInput && !passwordInput.hasAttribute('data-keyup-initialized')) {
+                    passwordInput.setAttribute('data-keyup-initialized', 'true');
+                    passwordInput.addEventListener('keyup', function(e) {
+                        if (e.key === 'Enter') {
+                            authenticateDepartment();
+                        }
+                    });
+                }
+            }
+            
+            // 사역 카테고리 옵션 업데이트 (ChatGPT 솔루션)
+            function updateMinistryCategoryOptions() {
+                const type = document.getElementById('ministryType').value;
+                const categorySelect = document.getElementById('ministryCategory');
+                
+                categorySelect.innerHTML = '<option value="">선택하세요</option>';
+                
+                if (type && ministryCategoryOptions[type]) {
+                    ministryCategoryOptions[type].forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category;
+                        option.textContent = category;
+                        categorySelect.appendChild(option);
+                    });
+                }
+            }
+
+            // =================== 기존 함수들 ===================
 
             // 부서 선택
             function selectDepartment(department) {
@@ -1077,6 +1680,7 @@ app.get('/', (c) => {
                 }
 
                 try {
+                    showMessage('🔐 인증 중입니다...', 'info');
                     const response = await fetch('/api/auth/department', {
                         method: 'POST',
                         headers: {
@@ -1089,20 +1693,23 @@ app.get('/', (c) => {
                     });
 
                     const result = await response.json();
+                    console.log('🔐 인증 결과:', result);
 
                     if (result.success) {
                         currentDepartment = selectedDepartment;
-                        document.getElementById('departmentSection').style.display = 'none';
-                        document.getElementById('mainMenuSection').style.display = 'block';
-                        document.getElementById('welcomeMessage').textContent = currentDepartment + ' 관리자님, 안녕하세요!';
-                        showMessage(result.message, 'success');
+                        clientStorage.saveToLocalStorage();
+                        showMessage('✅ ' + selectedDepartment + ' 로그인 성공!', 'success');
+                        setTimeout(() => {
+                            showMainMenu();
+                        }, 1000);
                     } else {
-                        showMessage(result.message, 'error');
+                        showMessage('❌ ' + result.message, 'error');
                         document.getElementById('departmentPassword').value = '';
                         document.getElementById('departmentPassword').focus();
                     }
                 } catch (error) {
-                    showMessage('인증 중 오류가 발생했습니다: ' + error.message, 'error');
+                    console.error('로그인 오류:', error);
+                    showMessage('❌ 로그인 중 오류가 발생했습니다: ' + error.message, 'error');
                 }
             }
 
@@ -1140,6 +1747,8 @@ app.get('/', (c) => {
 
             // 메인 메뉴로 돌아가기
             function showMainMenu() {
+                console.log('🏠 메인 메뉴 표시');
+                document.getElementById('departmentSection').style.display = 'none';
                 document.getElementById('mainMenuSection').style.display = 'block';
                 document.getElementById('accountingSection').style.display = 'none';
                 document.getElementById('ministrySection').style.display = 'none';
@@ -1148,9 +1757,20 @@ app.get('/', (c) => {
 
             // 로그아웃
             function logout() {
+                console.log('🚪 로그아웃');
                 currentDepartment = '';
                 selectedDepartment = '';
                 currentMode = '';
+                
+                // 화면 초기화
+                document.getElementById('departmentSection').style.display = 'block';
+                document.getElementById('mainMenuSection').style.display = 'none';
+                document.getElementById('accountingSection').style.display = 'none';
+                document.getElementById('ministrySection').style.display = 'none';
+                document.getElementById('passwordSection').style.display = 'none';
+                document.getElementById('departmentPassword').value = '';
+                
+                showMessage('로그아웃되었습니다.', 'info');
                 
                 document.getElementById('departmentSection').style.display = 'block';
                 document.getElementById('mainMenuSection').style.display = 'none';
@@ -1164,33 +1784,7 @@ app.get('/', (c) => {
 
             // =================== 회계 관리 함수들 ===================
 
-            // 회계 탭 전환
-            function showAccountingTab(tabName) {
-                // 모든 탭 비활성화
-                document.querySelectorAll('#accountingSection .tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                document.querySelectorAll('#accountingSection .tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                
-                // 선택된 탭 활성화
-                document.querySelector('#accountingSection .tab:nth-child(' + getTabIndex(tabName) + ')').classList.add('active');
-                document.getElementById('accounting' + capitalize(tabName) + 'Tab').classList.add('active');
-                
-                if (tabName === 'list') {
-                    loadTransactions();
-                }
-            }
-
-            function getTabIndex(tabName) {
-                const tabMap = {'input': 1, 'list': 2, 'summary': 3};
-                return tabMap[tabName] || 1;
-            }
-
-            function capitalize(str) {
-                return str.charAt(0).toUpperCase() + str.slice(1);
-            }
+            // 탭 기능 제거됨 - 횡적 레이아웃에서 모든 기능이 동시에 표시됨
 
             // 카테고리 옵션 업데이트
             function updateCategoryOptions() {
@@ -1209,112 +1803,7 @@ app.get('/', (c) => {
                 }
             }
 
-            // 거래 추가 (전역 변수로 중복 방지)
-            let transactionSubmitting = false;
-            
-            function initTransactionForm() {
-                const form = document.getElementById('transactionForm');
-                if (form && !form.hasAttribute('data-initialized')) {
-                    form.setAttribute('data-initialized', 'true');
-                    
-                    form.addEventListener('submit', async function(e) {
-                        e.preventDefault();
-                        
-                        // 중복 제출 방지
-                        if (transactionSubmitting) {
-                            showMessage('⏳ 처리 중입니다. 잠시만 기다려주세요.', 'info');
-                            return;
-                        }
-                        
-                        // 수정 모드 확인
-                        const submitBtn = form.querySelector('button[type="submit"]');
-                        const isEditing = submitBtn.getAttribute('data-editing') === 'true';
-                        const rowIndex = submitBtn.getAttribute('data-row-index');
-                        
-                        const transactionData = {
-                            date: document.getElementById('transactionDate').value,
-                            type: document.getElementById('transactionType').value,
-                            category: document.getElementById('transactionCategory').value,
-                            description: document.getElementById('transactionDescription').value,
-                            manager: document.getElementById('transactionManager').value,
-                            amount: document.getElementById('transactionAmount').value
-                        };
-
-                        if (!transactionData.date || !transactionData.type || !transactionData.category || !transactionData.description || !transactionData.amount) {
-                            showMessage('❌ 필수 항목을 모두 입력해주세요.', 'error');
-                            return;
-                        }
-
-                        try {
-                            transactionSubmitting = true;
-                            const submitBtn = form.querySelector('button[type="submit"]');
-                            const originalText = submitBtn.textContent;
-                            
-                            // 버튼 상태 변경
-                            submitBtn.disabled = true;
-                            submitBtn.textContent = '추가 중...';
-                            submitBtn.style.opacity = '0.7';
-                            
-                            // 로딩 메시지
-                            if (isEditing) {
-                                showMessage('⏳ 거래를 수정하고 있습니다...', 'info');
-                            } else {
-                                showMessage('⏳ 거래를 추가하고 있습니다...', 'info');
-                            }
-
-                            const url = isEditing ? 
-                                '/api/accounting/transaction/' + currentDepartment + '/' + encodeURIComponent(rowIndex) :
-                                '/api/accounting/transaction/' + currentDepartment;
-                            const method = isEditing ? 'PUT' : 'POST';
-                            
-                            const response = await fetch(url, {
-                                method: method,
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify(transactionData)
-                            });
-
-                            const result = await response.json();
-
-                            if (result.success) {
-                                showMessage('✅ ' + result.message, 'success');
-                                
-                                if (isEditing) {
-                                    // 수정 모드 종료
-                                    cancelTransactionEdit();
-                                } else {
-                                    // 펼 리셋하지 않고 내용 필드만 초기화 (사용자 요청)
-                                    document.getElementById('transactionDescription').value = '';
-                                    document.getElementById('transactionAmount').value = '';
-                                    document.getElementById('transactionManager').value = '';
-                                    // 내용 필드에 포커스
-                                    document.getElementById('transactionDescription').focus();
-                                }
-                                loadTransactions();
-                            } else {
-                                showMessage('❌ ' + result.message, 'error');
-                            }
-                            
-                            // 버튼 상태 복원
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = originalText;
-                            submitBtn.style.opacity = '1';
-                            
-                        } catch (error) {
-                            showMessage('❌ 거래 추가 중 오류가 발생했습니다: ' + error.message, 'error');
-                            
-                            // 오류 시에도 버튼 상태 복원
-                            const submitBtn = form.querySelector('button[type="submit"]');
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = '거래 추가';
-                            submitBtn.style.opacity = '1';
-                        } finally {
-                            transactionSubmitting = false;
-                        }
-                    });
-                }
-            }
+            // 기존 initTransactionForm 제거됨 - ChatGPT 솔루션 onAddTransaction 사용
 
             // 거래 목록 로드
             async function loadTransactions() {
@@ -1341,6 +1830,7 @@ app.get('/', (c) => {
 
             // 거래 목록 표시 (이벤트 위임 방식)
             function displayTransactions(transactions) {
+                console.log('displayTransactions 호출됨, 거래 수:', transactions.length);
                 const tbody = document.getElementById('transactionList');
                 
                 // 원본 데이터 저장 (정렬을 위해)
@@ -1348,12 +1838,21 @@ app.get('/', (c) => {
                     originalTransactions = [...transactions];
                 }
                 
-                if (transactions.length === 0) {
+                // 자동 정렬: 최신 날짜 기준 내림차순
+                const sortedTransactions = [...transactions].sort((a, b) => {
+                    const dateA = new Date(a.date);
+                    const dateB = new Date(b.date);
+                    return dateB - dateA; // 내림차순 (최신 날짜가 위에)
+                });
+                
+                console.log('정렬된 거래 목록:', sortedTransactions);
+                
+                if (sortedTransactions.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="7" class="loading">등록된 거래가 없습니다.</td></tr>';
                 } else {
                     tbody.innerHTML = ''; // 기존 내용 초기화
                     
-                    transactions.forEach((transaction) => {
+                    sortedTransactions.forEach((transaction) => {
                         const row = document.createElement('tr');
                         // data-id와 data-type 사용으로 이벤트 위임 지원
                         row.setAttribute('data-id', transaction.rowIndex);
@@ -1372,8 +1871,8 @@ app.get('/', (c) => {
                             '<td>' + transaction.manager + '</td>' +
                             '<td>' + formatCurrency(transaction.amount) + '</td>' +
                             '<td>' +
-                                '<button class="btn-small btn-info" data-action="edit" style="margin-right: 5px;">수정</button>' +
-                                '<button class="btn-small btn-danger" data-action="delete">삭제</button>' +
+                                '<button type="button" class="btn-small btn-info" data-action="edit" data-id="' + transaction.rowIndex + '" style="margin-right: 5px;">수정</button>' +
+                                '<button type="button" class="btn-small btn-danger" data-action="delete" data-id="' + transaction.rowIndex + '">삭제</button>' +
                             '</td>';
                         
                         tbody.appendChild(row);
@@ -1475,24 +1974,7 @@ app.get('/', (c) => {
 
             // =================== 사역 관리 함수들 ===================
 
-            // 사역 탭 전환
-            function showMinistryTab(tabName) {
-                // 모든 탭 비활성화
-                document.querySelectorAll('#ministrySection .tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                document.querySelectorAll('#ministrySection .tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                
-                // 선택된 탭 활성화
-                document.querySelector('#ministrySection .tab:nth-child(' + (tabName === 'input' ? 1 : 2) + ')').classList.add('active');
-                document.getElementById('ministry' + capitalize(tabName) + 'Tab').classList.add('active');
-                
-                if (tabName === 'list') {
-                    loadMinistryItems();
-                }
-            }
+            // 사역 탭 기능 제거됨 - 횡적 레이아웃에서 모든 기능이 동시에 표시됨
 
             // 사역 카테고리 옵션 업데이트
             function updateMinistryCategoryOptions() {
@@ -1511,108 +1993,7 @@ app.get('/', (c) => {
                 }
             }
 
-            // 사역 내용 추가 (전역 변수로 중복 방지)
-            let ministrySubmitting = false;
-            
-            function initMinistryForm() {
-                const form = document.getElementById('ministryForm');
-                if (form && !form.hasAttribute('data-initialized')) {
-                    form.setAttribute('data-initialized', 'true');
-                    
-                    form.addEventListener('submit', async function(e) {
-                        e.preventDefault();
-                        
-                        // 중복 제출 방지
-                        if (ministrySubmitting) {
-                            showMessage('⏳ 처리 중입니다. 잠시만 기다려주세요.', 'info');
-                            return;
-                        }
-                        
-                        // 수정 모드 확인
-                        const submitBtn = form.querySelector('button[type="submit"]');
-                        const isEditing = submitBtn.getAttribute('data-editing') === 'true';
-                        const rowIndex = submitBtn.getAttribute('data-row-index');
-                        
-                        const ministryData = {
-                            date: document.getElementById('ministryDate').value,
-                            type: document.getElementById('ministryType').value,
-                            category: document.getElementById('ministryCategory').value,
-                            content: document.getElementById('ministryContent').value
-                        };
-
-                        if (!ministryData.date || !ministryData.type || !ministryData.category || !ministryData.content) {
-                            showMessage('❌ 필수 항목을 모두 입력해주세요.', 'error');
-                            return;
-                        }
-
-                        try {
-                            ministrySubmitting = true;
-                            const submitBtn = form.querySelector('button[type="submit"]');
-                            const originalText = submitBtn.textContent;
-                            
-                            // 버튼 상태 변경
-                            submitBtn.disabled = true;
-                            submitBtn.textContent = '추가 중...';
-                            submitBtn.style.opacity = '0.7';
-                            
-                            // 로딩 메시지
-                            if (isEditing) {
-                                showMessage('⏳ 사역 내용을 수정하고 있습니다...', 'info');
-                            } else {
-                                showMessage('⏳ 사역 내용을 추가하고 있습니다...', 'info');
-                            }
-
-                            const url = isEditing ? 
-                                '/api/ministry/item/' + currentDepartment + '/' + encodeURIComponent(rowIndex) :
-                                '/api/ministry/item/' + currentDepartment;
-                            const method = isEditing ? 'PUT' : 'POST';
-                            
-                            const response = await fetch(url, {
-                                method: method,
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify(ministryData)
-                            });
-
-                            const result = await response.json();
-
-                            if (result.success) {
-                                showMessage('✅ ' + result.message, 'success');
-                                
-                                if (isEditing) {
-                                    // 수정 모드 종료
-                                    cancelMinistryEdit();
-                                } else {
-                                    // 폼 리셋하지 않고 내용만 초기화 (사용자 요청)
-                                    document.getElementById('ministryContent').value = '';
-                                    // 내용 필드에 포커스 (다음 입력 편의성)
-                                    document.getElementById('ministryContent').focus();
-                                }
-                                loadMinistryItems();
-                            } else {
-                                showMessage('❌ ' + result.message, 'error');
-                            }
-                            
-                            // 버튼 상태 복원
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = originalText;
-                            submitBtn.style.opacity = '1';
-                            
-                        } catch (error) {
-                            showMessage('❌ 사역 내용 추가 중 오류가 발생했습니다: ' + error.message, 'error');
-                            
-                            // 오류 시에도 버튼 상태 복원
-                            const submitBtn = form.querySelector('button[type="submit"]');
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = '내용 추가';
-                            submitBtn.style.opacity = '1';
-                        } finally {
-                            ministrySubmitting = false;
-                        }
-                    });
-                }
-            }
+            // 기존 initMinistryForm 제거됨 - ChatGPT 솔루션 onAddMinistry 사용
             
 
 
@@ -1668,8 +2049,8 @@ app.get('/', (c) => {
                             '<td>' + item.category + '</td>' +
                             '<td class="ministry-content">' + item.content + '</td>' +
                             '<td>' +
-                                '<button class="btn-small btn-info" data-action="edit" style="margin-right: 5px;">수정</button>' +
-                                '<button class="btn-small btn-danger" data-action="delete">삭제</button>' +
+                                '<button type="button" class="btn-small btn-info" data-action="edit" data-id="' + item.rowIndex + '" style="margin-right: 5px;">수정</button>' +
+                                '<button type="button" class="btn-small btn-danger" data-action="delete" data-id="' + item.rowIndex + '">삭제</button>' +
                             '</td>';
                         
                         ministryTbody.appendChild(row);
@@ -1698,8 +2079,8 @@ app.get('/', (c) => {
                             '<td>' + item.category + '</td>' +
                             '<td class="ministry-content">' + item.content + '</td>' +
                             '<td>' +
-                                '<button class="btn-small btn-info" data-action="edit" style="margin-right: 5px;">수정</button>' +
-                                '<button class="btn-small btn-danger" data-action="delete">삭제</button>' +
+                                '<button type="button" class="btn-small btn-info" data-action="edit" data-id="' + item.rowIndex + '" style="margin-right: 5px;">수정</button>' +
+                                '<button type="button" class="btn-small btn-danger" data-action="delete" data-id="' + item.rowIndex + '">삭제</button>' +
                             '</td>';
                         
                         prayerTbody.appendChild(row);
@@ -2058,23 +2439,7 @@ app.get('/', (c) => {
                     });
                 });
                 
-                // 회계 탭 버튼들
-                const tabBtns = document.querySelectorAll('#accountingSection [data-tab]');
-                tabBtns.forEach(btn => {
-                    const tabName = btn.getAttribute('data-tab');
-                    btn.addEventListener('click', function() {
-                        showAccountingTab(tabName);
-                    });
-                });
-                
-                // 사역 탭 버튼들
-                const ministryTabBtns = document.querySelectorAll('[data-ministry-tab]');
-                ministryTabBtns.forEach(btn => {
-                    const tabName = btn.getAttribute('data-ministry-tab');
-                    btn.addEventListener('click', function() {
-                        showMinistryTab(tabName);
-                    });
-                });
+                // 탭 버튼 이벤트 제거됨 - 횡적 레이아웃으로 변경
                 
                 // 사역 뒤로가기 버튼
                 const ministryBackBtn = document.getElementById('ministryBackBtn');
@@ -2332,7 +2697,7 @@ app.get('/', (c) => {
 
             // 사역 목록 정렬된 데이터 표시 (별도 함수)
             function displayMinistryItemsSorted(ministryData, prayerData) {
-                // 사역 목록 표시
+                // 사역 목록 표시 (이벤트 위임 방식 - ChatGPT 솔루션)
                 const ministryTbody = document.getElementById('ministryList');
                 
                 if (ministryData.length === 0) {
@@ -2341,32 +2706,28 @@ app.get('/', (c) => {
                     ministryTbody.innerHTML = '';
                     
                     ministryData.forEach((item) => {
-                        const deleteBtn = document.createElement('button');
-                        deleteBtn.className = 'btn-small btn-danger';
-                        deleteBtn.textContent = '삭제';
-                        deleteBtn.setAttribute('data-row-index', item.rowIndex);
-                        deleteBtn.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const rowIndex = this.getAttribute('data-row-index');
-                            console.log('사역/기도제목 삭제 버튼 클릭:', rowIndex);
-                            if (confirm('이 내용을 삭제하시겠습니까?')) {
-                                deleteMinistryItem(rowIndex);
-                            }
-                        });
-                        
                         const row = document.createElement('tr');
+                        // data-id와 data-type 사용으로 이벤트 위임 지원
+                        row.setAttribute('data-id', item.rowIndex);
+                        row.setAttribute('data-type', 'ministry');
+                        row.setAttribute('data-date', item.date);
+                        row.setAttribute('data-ministry-type', item.type);
+                        row.setAttribute('data-category', item.category);
+                        row.setAttribute('data-content', item.content);
+                        
                         row.innerHTML = '<td>' + item.date + '</td>' +
                             '<td>' + item.category + '</td>' +
                             '<td style="max-width: 300px; word-wrap: break-word;">' + item.content + '</td>' +
-                            '<td></td>';
+                            '<td>' +
+                                '<button type="button" class="btn-small btn-info" data-action="edit" data-id="' + item.rowIndex + '" style="margin-right: 5px;">수정</button>' +
+                                '<button type="button" class="btn-small btn-danger" data-action="delete" data-id="' + item.rowIndex + '">삭제</button>' +
+                            '</td>';
                         
-                        row.lastElementChild.appendChild(deleteBtn);
                         ministryTbody.appendChild(row);
                     });
                 }
 
-                // 기도제목 목록 표시
+                // 기도제목 목록 표시 (이벤트 위임 방식 - ChatGPT 솔루션)
                 const prayerTbody = document.getElementById('prayerList');
                 
                 if (prayerData.length === 0) {
@@ -2375,27 +2736,23 @@ app.get('/', (c) => {
                     prayerTbody.innerHTML = '';
                     
                     prayerData.forEach((item) => {
-                        const deleteBtn = document.createElement('button');
-                        deleteBtn.className = 'btn-small btn-danger';
-                        deleteBtn.textContent = '삭제';
-                        deleteBtn.setAttribute('data-row-index', item.rowIndex);
-                        deleteBtn.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const rowIndex = this.getAttribute('data-row-index');
-                            console.log('사역/기도제목 삭제 버튼 클릭:', rowIndex);
-                            if (confirm('이 내용을 삭제하시겠습니까?')) {
-                                deleteMinistryItem(rowIndex);
-                            }
-                        });
-                        
                         const row = document.createElement('tr');
+                        // data-id와 data-type 사용으로 이벤트 위임 지원
+                        row.setAttribute('data-id', item.rowIndex);
+                        row.setAttribute('data-type', 'prayer');
+                        row.setAttribute('data-date', item.date);
+                        row.setAttribute('data-ministry-type', item.type);
+                        row.setAttribute('data-category', item.category);
+                        row.setAttribute('data-content', item.content);
+                        
                         row.innerHTML = '<td>' + item.date + '</td>' +
                             '<td>' + item.category + '</td>' +
                             '<td style="max-width: 300px; word-wrap: break-word;">' + item.content + '</td>' +
-                            '<td></td>';
+                            '<td>' +
+                                '<button type="button" class="btn-small btn-info" data-action="edit" data-id="' + item.rowIndex + '" style="margin-right: 5px;">수정</button>' +
+                                '<button type="button" class="btn-small btn-danger" data-action="delete" data-id="' + item.rowIndex + '">삭제</button>' +
+                            '</td>';
                         
-                        row.lastElementChild.appendChild(deleteBtn);
                         prayerTbody.appendChild(row);
                     });
                 }
@@ -2711,86 +3068,118 @@ async function getAccessToken(env: Bindings) {
 }
 
 // 메모리 스토리지 (실제 서비스에서는 데이터베이스 사용)
+// 개선된 메모리 저장소 (ID 관리 포함)
 const memoryStorage = {
   transactions: new Map<string, any[]>(),
-  ministries: new Map<string, any[]>()
+  ministries: new Map<string, any[]>(),
+  nextTransactionId: 1,  // 순차 ID 관리
+  nextMinistryId: 1,     // 순차 ID 관리
+  
+  // ID 생성 함수
+  getNextTransactionId() {
+    return this.nextTransactionId++
+  },
+  
+  getNextMinistryId() {
+    return this.nextMinistryId++
+  },
+  
+  // 로컬스토리지 백업 (선택사항)
+  saveToLocalStorage() {
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem('saesoon_transactions', JSON.stringify(Array.from(this.transactions.entries())))
+        localStorage.setItem('saesoon_ministries', JSON.stringify(Array.from(this.ministries.entries())))
+        localStorage.setItem('saesoon_next_ids', JSON.stringify({
+          transaction: this.nextTransactionId,
+          ministry: this.nextMinistryId
+        }))
+        console.log('💾 로컬스토리지 백업 완료')
+      } catch (e) {
+        console.warn('로컬스토리지 저장 실패:', e)
+      }
+    }
+  },
+  
+  // 로컬스토리지 복원 (선택사항)
+  loadFromLocalStorage() {
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const transactions = localStorage.getItem('saesoon_transactions')
+        const ministries = localStorage.getItem('saesoon_ministries')
+        const nextIds = localStorage.getItem('saesoon_next_ids')
+        
+        if (transactions) {
+          this.transactions = new Map(JSON.parse(transactions))
+        }
+        if (ministries) {
+          this.ministries = new Map(JSON.parse(ministries))
+        }
+        if (nextIds) {
+          const ids = JSON.parse(nextIds)
+          this.nextTransactionId = ids.transaction || 1
+          this.nextMinistryId = ids.ministry || 1
+        }
+        console.log('📁 로컬스토리지 복원 완료')
+      } catch (e) {
+        console.warn('로컬스토리지 복원 실패:', e)
+      }
+    }
+  }
 }
 
-// Google Sheets API 호출 함수 (하이브리드 모드 - 메모리 + 구글시트)
+// 순수 메모리 기반 API (구글시트 연동 제거)
 async function callSheetsAPI(env: Bindings, method: string, endpoint: string, data?: any) {
+  console.log('🔥 순수 메모리 API 호출:', method, endpoint)
+  
   try {
-    // GET 요청의 경우 메모리에서 데이터 조회 또는 Google Sheets에서 조회
+    // GET 요청의 경우 메모리에서만 데이터 조회
     if (method === 'GET') {
       if (endpoint.includes('values/')) {
         const sheetName = endpoint.split('/')[1].split('!')[0]
+        console.log('📊 데이터 조회 요청:', sheetName)
         
-        // Google Sheets에서 기본 데이터 조회
-        const csvUrl = `https://docs.google.com/spreadsheets/d/${env.SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${sheetName}`
-        
-        console.log('CSV API Call:', csvUrl)
-        let googleSheetValues = []
-        
-        try {
-          const response = await fetch(csvUrl)
-          if (response.ok) {
-            const csvText = await response.text()
-            googleSheetValues = parseCSV(csvText)
-          }
-        } catch (csvError) {
-          console.log('Google Sheets CSV 조회 실패, 메모리 데이터만 사용:', csvError)
-        }
-        
-        // 메모리에서 추가 데이터 조회
+        // 메모리에서만 데이터 조회 (구글시트 제거)
         let memoryValues = []
+        let header = []
+        
         if (sheetName.includes('사역')) {
           const department = sheetName.replace('사역', '')
           const memoryData = memoryStorage.ministries.get(department) || []
-          memoryValues = memoryData.map(item => [item.date, item.type, item.category, item.content])
+          memoryValues = memoryData.map(item => [item.date, item.type, item.category, item.content, 'mem_' + item.id])
+          header = ['날짜', '유형', '항목', '내용', 'rowIndex']
+          console.log('📋 사역 데이터 조회:', department, memoryData.length, '건')
         } else {
           const memoryData = memoryStorage.transactions.get(sheetName) || []
-          memoryValues = memoryData.map(item => [item.date, item.type, item.category, item.description, item.manager, item.amount])
+          memoryValues = memoryData.map(item => [item.date, item.type, item.category, item.description, item.manager, item.amount, 'mem_' + item.id])
+          header = ['날짜', '유형', '항목', '적요', '담당자', '금액', 'rowIndex']
+          console.log('💰 회계 데이터 조회:', sheetName, memoryData.length, '건')
         }
         
-        // 헤더 설정
-        const header = sheetName.includes('사역') 
-          ? ['날짜', '유형', '항목', '내용']
-          : ['날짜', '유형', '항목', '적요', '담당자', '금액']
-        
-        // 구글 시트 데이터와 메모리 데이터 합치기
-        const allValues = []
-        if (googleSheetValues.length > 0) {
-          allValues.push(...googleSheetValues)
-        } else {
-          allValues.push(header) // 헤더만 추가
-        }
-        
-        // 메모리 데이터 추가 (중복 방지는 상위에서 처리)
-        if (memoryValues.length > 0) {
-          allValues.push(...memoryValues)
-        }
+        // 헤더 + 데이터 결합
+        const allValues = [header, ...memoryValues]
+        console.log('✅ 전체 데이터:', allValues.length - 1, '건 반환')
         
         return { values: allValues }
       }
     }
     
-    // POST/PUT/DELETE 요청의 경우 메모리에만 저장 (구글시트는 읽기 전용)
+    // POST/PUT/DELETE 요청의 경우 순수 메모리 저장
     if (method === 'POST' || method === 'PUT' || method === 'DELETE') {
-      console.log('Memory Storage API Call:', method, endpoint, data)
+      console.log('🔄 메모리 저장 요청:', method, endpoint)
       
       if (endpoint.includes(':append') && data?.values) {
-        // 데이터 추가 (멤모리에만)
+        // 데이터 추가 (순차 ID 사용)
         const range = endpoint.split('values/')[1].split(':')[0]
         const sheetName = range.split('!')[0]
-        
-        // 중복 방지를 위한 고유 ID 생성
-        const uniqueId = Date.now() + Math.random()
         
         if (sheetName.includes('사역')) {
           // 사역 데이터
           const department = sheetName.replace('사역', '')
           const existingData = memoryStorage.ministries.get(department) || []
+          const newId = memoryStorage.getNextMinistryId()
           const newItem = {
-            id: uniqueId,
+            id: newId,
             date: data.values[0][0],
             type: data.values[0][1], 
             category: data.values[0][2],
@@ -2798,31 +3187,46 @@ async function callSheetsAPI(env: Bindings, method: string, endpoint: string, da
           }
           existingData.push(newItem)
           memoryStorage.ministries.set(department, existingData)
-          console.log('사역 데이터 멤모리 추가:', department, newItem)
+          memoryStorage.saveToLocalStorage() // 자동 백업
+          console.log('✅ 사역 데이터 추가 성공:', department, 'ID:', newId)
         } else {
           // 회계 데이터
           const existingData = memoryStorage.transactions.get(sheetName) || []
+          const newId = memoryStorage.getNextTransactionId()
           const newItem = {
-            id: uniqueId,
+            id: newId,
             date: data.values[0][0],
             type: data.values[0][1],
             category: data.values[0][2], 
             description: data.values[0][3],
             manager: data.values[0][4],
-            amount: data.values[0][5]
+            amount: parseFloat(data.values[0][5]) || 0
           }
           existingData.push(newItem)
           memoryStorage.transactions.set(sheetName, existingData)
-          console.log('회계 데이터 멤모리 추가:', sheetName, newItem)
+          memoryStorage.saveToLocalStorage() // 자동 백업
+          console.log('✅ 회계 데이터 추가 성공:', sheetName, 'ID:', newId)
         }
         
         return { updates: { updatedRows: 1 } }
       }
       
       if (endpoint.includes(':batchUpdate')) {
-        // 삭제 요청은 메모리에서만 처리 (실제 구글시트는 수정하지 않음)
-        console.log('멤모리에서 행 삭제 처리:', data)
+        // 삭제 요청 처리 (메모리에서만)
+        console.log('🗑️ 메모리 삭제 요청:', data)
         return { replies: [{}] }
+      }
+      
+      // PUT (수정) 요청 처리
+      if (method === 'PUT' && endpoint.includes('values/')) {
+        console.log('✏️ 메모리 수정 요청 처리됨')
+        return { updatedCells: 1 }
+      }
+      
+      // DELETE (삭제) 요청 처리
+      if (method === 'DELETE') {
+        console.log('🗑️ 메모리 삭제 요청 처리됨')
+        return { success: true }
       }
       
       return { success: true }
@@ -2869,6 +3273,16 @@ function parseCSV(csvText: string): string[][] {
   
   return result
 }
+
+// 테스트 API 엔드포인트
+app.get('/api/test', (c) => {
+  console.log('테스트 API 호출됨');
+  return c.json({ 
+    success: true, 
+    message: 'API 서버 정상 작동',
+    timestamp: new Date().toISOString() 
+  });
+});
 
 // 거래 추가
 app.post('/api/accounting/transaction/:department', async (c) => {
@@ -2993,7 +3407,7 @@ app.get('/api/accounting/transactions/:department', async (c) => {
         const row = result.values[i]
         if (row && row.length >= 6) {
           const transaction = {
-            rowIndex: i + 1, // 실제 시트 행 번호
+            rowIndex: row[6] || (i + 1), // rowIndex가 있으면 사용, 없으면 행 번호
             date: row[0] || '',
             type: row[1] || '',
             category: row[2] || '',
@@ -3013,27 +3427,9 @@ app.get('/api/accounting/transactions/:department', async (c) => {
       }
     }
     
-    // 메모리에서 추가 데이터 가져오기
-    const memoryData = memoryStorage.transactions.get(department) || []
-    for (const item of memoryData) {
-      const transaction = {
-        rowIndex: 'mem_' + item.id, // 메모리 데이터 구분
-        date: item.date,
-        type: item.type,
-        category: item.category,
-        description: item.description,
-        manager: item.manager || '',
-        amount: parseFloat(item.amount) || 0
-      }
-      
-      transactions.push(transaction)
-      
-      if (item.type === '수입') {
-        totalIncome += parseFloat(item.amount) || 0
-      } else if (item.type === '지출') {
-        totalExpense += parseFloat(item.amount) || 0
-      }
-    }
+    // ChatGPT 솔루션: 단일 소스만 사용 (메모리 중복 접근 제거)
+    // callSheetsAPI에서 이미 순수 메모리 데이터를 반환하므로 추가 접근 불필요
+    console.log('✅ 단일 소스 데이터 사용 - callSheetsAPI 결과만 활용');
     
     const summary = {
       income: totalIncome,
@@ -3241,7 +3637,7 @@ app.get('/api/ministry/items/:department', async (c) => {
         const row = result.values[i]
         if (row && row.length >= 4) {
           const item = {
-            rowIndex: i + 1, // 실제 시트 행 번호
+            rowIndex: row[4] || (i + 1), // rowIndex가 있으면 사용, 없으면 행 번호
             date: row[0] || '',
             type: row[1] || '',
             category: row[2] || '',
@@ -3257,23 +3653,9 @@ app.get('/api/ministry/items/:department', async (c) => {
       }
     }
     
-    // 메모리에서 추가 데이터 가져오기
-    const memoryData = memoryStorage.ministries.get(department) || []
-    for (const item of memoryData) {
-      const ministryItem = {
-        rowIndex: 'mem_' + item.id, // 메모리 데이터 구분
-        date: item.date,
-        type: item.type,
-        category: item.category,
-        content: item.content
-      }
-      
-      if (item.type === '사역') {
-        ministryItems.push(ministryItem)
-      } else if (item.type === '기도제목') {
-        prayerItems.push(ministryItem)
-      }
-    }
+    // ChatGPT 솔루션: 단일 소스만 사용 (메모리 중복 접근 제거)
+    // callSheetsAPI에서 이미 순수 메모리 데이터를 반환하므로 추가 접근 불필요
+    console.log('✅ 단일 소스 데이터 사용 - callSheetsAPI 결과만 활용');
     
     return c.json({
       success: true,
